@@ -28,14 +28,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Type check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
       - name: Build
         run: npm run build
 
       - name: Test
-        run: npm test
+        run: npm run test:coverage
 
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release
+        run: ./node_modules/.bin/semantic-release
