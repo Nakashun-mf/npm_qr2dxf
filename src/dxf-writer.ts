@@ -13,21 +13,38 @@ import type { QRDxfOptions } from './types.js';
 
 const DEFAULTS = {
   cellSize: 1.0,
-  errorCorrectionLevel: 'M' as const,
   margin: 4,
   layer: '0',
   entity: 'SOLID' as const,
-};
+} as const;
+
+const INVALID_LAYER_CHARS = /[<>/\\":;?*|=']/;
 
 export function matrixToDxf(
   matrix: boolean[][],
-  size: number,
   options: QRDxfOptions = {}
 ): string {
+  const size = matrix.length;
   const cellSize = options.cellSize ?? DEFAULTS.cellSize;
   const margin = options.margin ?? DEFAULTS.margin;
   const layerName = options.layer ?? DEFAULTS.layer;
   const entityType = options.entity ?? DEFAULTS.entity;
+
+  if (!Number.isFinite(cellSize) || cellSize <= 0) {
+    throw new RangeError(`cellSize must be a positive finite number, got ${cellSize}`);
+  }
+  if (!Number.isFinite(margin) || margin < 0) {
+    throw new RangeError(`margin must be a non-negative finite number, got ${margin}`);
+  }
+  if (margin < 4) {
+    console.warn(
+      `[qr-to-dxf] margin=${margin} is below the QR spec minimum of 4 (ISO/IEC 18004). ` +
+        `The generated QR code may not be scannable.`
+    );
+  }
+  if (layerName.length > 255 || INVALID_LAYER_CHARS.test(layerName)) {
+    throw new Error(`Invalid DXF layer name: "${layerName}"`);
+  }
 
   const dxf = new DxfWriter();
 

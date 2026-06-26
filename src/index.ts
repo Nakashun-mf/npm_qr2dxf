@@ -7,10 +7,15 @@ export type { QRDxfOptions, GenerateQRDxf, GenerateQRDxfFile };
 
 export const generateQRDxf: GenerateQRDxf = async (content, options = {}) => {
   const ecLevel = options.errorCorrectionLevel ?? 'M';
-  const { matrix, size } = await generateQRMatrix(content, ecLevel);
-  return matrixToDxf(matrix, size, options);
+  const { matrix } = await generateQRMatrix(content, ecLevel);
+  return matrixToDxf(matrix, options);
 };
 
+/**
+ * Write a QR code as a DXF file to disk.
+ * @remarks **Node.js only** — uses `fs/promises`. Not available in browser environments.
+ * For browser use, call `generateQRDxf` and handle the DXF string yourself.
+ */
 export const generateQRDxfFile: GenerateQRDxfFile = async (
   content,
   outputPath,
