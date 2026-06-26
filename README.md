@@ -3,7 +3,7 @@
 > Generate DXF files from QR codes for laser cutting, CNC machining, and engraving.
 
 [![npm version](https://badge.fury.io/js/qr-to-dxf.svg)](https://badge.fury.io/js/qr-to-dxf)
-[![CI](https://github.com/Nakashun-mf/qr-to-dxf/actions/workflows/ci.yml/badge.svg)](https://github.com/Nakashun-mf/qr-to-dxf/actions/workflows/ci.yml)
+[![CI](https://github.com/Nakashun-mf/npm_qr2dxf/actions/workflows/ci.yml/badge.svg)](https://github.com/Nakashun-mf/npm_qr2dxf/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Why?
@@ -21,10 +21,10 @@ npm install qr-to-dxf
 ```typescript
 import { generateQRDxf, generateQRDxfFile } from 'qr-to-dxf';
 
-// Get DXF string
+// Get DXF string (works in Node.js and browsers)
 const dxf = await generateQRDxf('https://example.com');
 
-// Write directly to file (Node.js)
+// Write directly to file (Node.js only)
 await generateQRDxfFile('https://example.com', './output.dxf');
 ```
 
@@ -44,11 +44,27 @@ const dxf = await generateQRDxf('https://example.com', {
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `cellSize` | `number` | `1.0` | Size of each QR module in millimeters |
+| `cellSize` | `number` | `1.0` | Size of each QR module in millimeters. Must be > 0. |
 | `errorCorrectionLevel` | `'L' \| 'M' \| 'Q' \| 'H'` | `'M'` | QR error correction level |
-| `margin` | `number` | `4` | Quiet zone width in cells (QR spec requires ≥4) |
+| `margin` | `number` | `4` | Quiet zone width in cells. Must be ≥ 0; QR spec (ISO/IEC 18004) requires ≥ 4 for reliable scanning. Values below 4 emit a warning. |
 | `layer` | `string` | `'0'` | DXF layer name for all entities |
 | `entity` | `'SOLID' \| 'HATCH' \| 'LWPOLYLINE'` | `'SOLID'` | DXF entity type used for each dark cell |
+
+## Browser Compatibility
+
+| Function | Browser | Node.js |
+|----------|---------|---------|
+| `generateQRDxf` | ✅ | ✅ |
+| `generateQRDxfFile` | ❌ Node.js only | ✅ |
+
+In browser environments, use `generateQRDxf` and handle the string output yourself:
+
+```typescript
+const dxf = await generateQRDxf('https://example.com');
+const blob = new Blob([dxf], { type: 'application/dxf' });
+const url = URL.createObjectURL(blob);
+// attach to a download link, etc.
+```
 
 ## Output Formats
 
@@ -84,7 +100,7 @@ import type { QRDxfOptions, GenerateQRDxf, GenerateQRDxfFile } from 'qr-to-dxf';
 
 ## Contributing
 
-Issues and pull requests are welcome at [GitHub](https://github.com/Nakashun-mf/qr-to-dxf).
+Issues and pull requests are welcome at [GitHub](https://github.com/Nakashun-mf/npm_qr2dxf).
 
 ## License
 
